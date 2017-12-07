@@ -2,23 +2,10 @@ package bgu.spl.a2;
 
 import java.util.Collection;
 
-/**
- * an abstract class that represents an action that may be executed using the
- * {@link ActorThreadPool}
- *
- * Note for implementors: you may add methods and synchronize any of the
- * existing methods in this class *BUT* you must be able to explain why the
- * synchronization is needed. In addition, the methods you add to this class can
- * only be private!!!
- *
- * @param <R> the action result type
- */
+
 public abstract class Action<R> {
 
-	/**
-     * start handling the action - note that this method is protected, a thread
-     * cannot call it directly.
-     */
+
     protected abstract void start();
     
 
@@ -34,7 +21,7 @@ public abstract class Action<R> {
     * public/private/protected
     *
     */
-   /*package*/ final void handle() {
+   /*package*/ final void handle(ActorThreadPool pool, String actorId, PrivateState actorState) {
    }
     
     

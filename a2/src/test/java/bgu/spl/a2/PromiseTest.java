@@ -73,10 +73,10 @@ public class PromiseTest extends TestCase {
 			toTest.resolve(10);
 		}
 		catch (Exception e) {Assert.fail();}
-		assertEquals(4, testArray[0]);
+		assertEquals(8, testArray[0]);
 		
 		toTest.subscribe(toAdd);
-		assertEquals(8, testArray[0]);
+		assertEquals(16, testArray[0]);
 		
 	}
 

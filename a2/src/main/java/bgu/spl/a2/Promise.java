@@ -1,6 +1,5 @@
 package bgu.spl.a2;
 
-import java.awt.List;
 import java.util.ArrayList;
 /**
  * this class represents a deferred result i.e., an object that eventually will
@@ -36,30 +35,13 @@ public class Promise<T>{
 			throw new IllegalStateException("Not resolved yet");
 	}
 
-	/**
-	 *
-	 * @return true if this object has been resolved - i.e., if the method
-	 *         {@link #resolve(java.lang.Object)} has been called on this object
-	 *         before.
-	 */
+
 	public boolean isResolved() {
 		return isRes;
 	}
 
 
-	/**
-	 * resolve this promise object - from now on, any call to the method
-	 * {@link #get()} should return the given value
-	 *
-	 * Any callbacks that were registered to be notified when this object is
-	 * resolved via the {@link #subscribe(callback)} method should
-	 * be executed before this method returns
-	 *
-     * @throws IllegalStateException
-     * 			in the case where this object is already resolved
-	 * @param value
-	 *            - the value to resolve this promise object with
-	 */
+
 	public void resolve(T value){
 		if (isRes)
 			throw new IllegalStateException("Already resolved");
@@ -90,7 +72,6 @@ public class Promise<T>{
 			callback.call();
 		else
 		{
-			if (!subscribers.contains(callback))
 				subscribers.add(callback);
 		}
 	}
