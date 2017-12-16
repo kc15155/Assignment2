@@ -7,12 +7,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class Action<R> {
 	
-	private String name;
-	private Promise<R> result;
-	private ActorThreadPool myPool;
+	protected String name;
+	private Promise<R> result; 
+	protected ActorThreadPool myPool;
 	private callback myCallback;
-	private String actorId;
-	private PrivateState actorState;
+	protected String actorId;
+	protected PrivateState actorState;
 	
     protected abstract void start();
     
@@ -27,7 +27,6 @@ public abstract class Action<R> {
 	   else
 	   {
 		   myCallback.call();
-		   complete(result.get());
 	   }
    }
     
@@ -44,8 +43,8 @@ public abstract class Action<R> {
 				counter[0]++;
 				if (counter[0]==actionSize)
 				{
-					myPool.submit(getAction(), actorId, actorState);
 					myCallback=toAdd;
+					sendMessage(getAction(), actorId, actorState);
 				}
 			}
 		};
@@ -53,6 +52,7 @@ public abstract class Action<R> {
     	{
     		temp.getResult().subscribe(newCall);
     	}	
+    	
     }
 
  

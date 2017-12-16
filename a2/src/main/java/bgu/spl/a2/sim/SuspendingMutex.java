@@ -1,16 +1,22 @@
 package bgu.spl.a2.sim;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import bgu.spl.a2.Promise;
 
-/**
- * 
- * this class is related to {@link Computer}
- * it indicates if a computer is free or not
- * 
- * Note: this class can be implemented without any synchronization. 
- * However, using synchronization will be accepted as long as the implementation is blocking free.
- *
- */
+
 public class SuspendingMutex {
+	
+	private AtomicBoolean isFree;
+	private Queue<Promise<Computer>> promiseQueue;
+	private Computer myComputer;
+	
+	public SuspendingMutex(Computer myComp)
+	{
+		isFree = new AtomicBoolean(true);
+		promiseQueue = new LinkedList<Promise<Computer>>();
+		myComputer=myComp;
+	}
 	
 	
 	/**
@@ -23,17 +29,22 @@ public class SuspendingMutex {
 	 * @return a promise for the requested computer
 	 */
 	public Promise<Computer> down(String computerType){
-		//TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		Promise<Computer> newPromise = new Promise<Computer>();
+		if (!isFree.get())
+		{
+			promiseQueue.add(newPromise);	
+		}
+		else
+		{
+			isFree.compareAndSet(true, false);
+			newPromise.resolve(myComputer);
+		}
+		return newPromise;
 	}
-	/**
-	 * Computer return procedure
-	 * releases a computer which becomes available in the warehouse upon completion
-	 * 
-	 * @param computer
-	 */
+
+	
 	public void up(Computer computer){
-		//TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		isFree.compareAndSet(false, true);
+		promiseQueue.poll().resolve(computer);
 	}
 }

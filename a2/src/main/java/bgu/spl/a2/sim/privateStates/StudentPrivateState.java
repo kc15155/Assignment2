@@ -4,9 +4,7 @@ import java.util.HashMap;
 
 import bgu.spl.a2.PrivateState;
 
-/**
- * this class describe student private state
- */
+
 public class StudentPrivateState extends PrivateState{
 
 	private HashMap<String, Integer> grades;
@@ -18,8 +16,7 @@ public class StudentPrivateState extends PrivateState{
 	 * this may cause automatic tests to fail..
 	 */
 	public StudentPrivateState() {
-		//TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		grades = new HashMap<String, Integer>();
 	}
 
 	public HashMap<String, Integer> getGrades() {
@@ -28,5 +25,10 @@ public class StudentPrivateState extends PrivateState{
 
 	public long getSignature() {
 		return signature;
+	}
+	
+	public void setSignature(long newSignature)
+	{
+		signature=newSignature;
 	}
 }

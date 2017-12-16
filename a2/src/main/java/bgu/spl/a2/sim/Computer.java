@@ -8,21 +8,44 @@ public class Computer {
 	String computerType;
 	long failSig;
 	long successSig;
+	SuspendingMutex myMutex;
 	
 	public Computer(String computerType) {
 		this.computerType = computerType;
+		myMutex= new SuspendingMutex(this);
 	}
 	
-	/**
-	 * this method checks if the courses' grades fulfill the conditions
-	 * @param courses
-	 * 							courses that should be pass
-	 * @param coursesGrades
-	 * 							courses' grade
-	 * @return a signature if couersesGrades grades meet the conditions
-	 */
+	public SuspendingMutex getMutex ()
+	{
+		return myMutex;
+	}
+	
+	public void setFail (long fail)
+	{
+		this.failSig=fail;
+	}
+	
+	public void setSuccess (long success)
+	{
+		this.successSig=success;
+	}
+	
+	public String getType ()
+	{
+		return computerType;
+	}
+
+	
 	public long checkAndSign(List<String> courses, Map<String, Integer> coursesGrades){
-		//TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		int counter=0;
+		for (String temp : courses)
+		{
+			if (coursesGrades.get(temp)!=null && coursesGrades.get(temp).intValue()>56)
+				counter++;
+		}
+		if (counter==courses.size())
+			return successSig;
+		else
+			return failSig;
 	}
 }

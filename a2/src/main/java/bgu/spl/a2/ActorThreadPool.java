@@ -1,7 +1,9 @@
 package bgu.spl.a2;
 
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -14,11 +16,14 @@ import bgu.spl.a2.sim.privateStates.StudentPrivateState;
 
 public class ActorThreadPool {
 	
-	ConcurrentHashMap<String, String> stateMap;
-	ConcurrentHashMap<String, Queue<Action>> actionMap;
-	ConcurrentHashMap<String, AtomicBoolean> blockMap;
-	Thread [] threadArray;
-	VersionMonitor myVer;
+	private ConcurrentHashMap<String, String> stateMap;
+	private ConcurrentHashMap<String, Queue<Action>> actionMap;
+	private ConcurrentHashMap<String, AtomicBoolean> blockMap;
+	private Thread [] threadArray;
+	private VersionMonitor myVer,terminateVM;
+	private final boolean[] terminate = {false};
+	private final int[] activeThreads = {0};
+	
 	
 	public ActorThreadPool(int nthreads) {
 		stateMap = new ConcurrentHashMap<String, String>();
@@ -26,26 +31,42 @@ public class ActorThreadPool {
 		blockMap = new ConcurrentHashMap<String, AtomicBoolean>();
 		threadArray = new Thread [nthreads];
 		myVer= new VersionMonitor();
+		terminateVM=new VersionMonitor();
 		Runnable r = new Runnable() {
 			public void run() {
+				int before = myVer.getVersion();
+				synchronized (activeThreads) {
+					activeThreads[0]++;
+					}
+				
 				for (String temp : actionMap.keySet())
 				{
 					if (!actionMap.get(temp).isEmpty())
 					{
 						if (blockMap.get(temp).compareAndSet(true,false))
 						{
-							actionMap.get(temp).poll().handle(getPool(), temp, checkPrivateState(temp));
+							actionMap.get(temp).poll().handle(getPool(), temp, getPrivateStates(temp));
 							myVer.inc();
 						}
 							blockMap.get(temp).set(true);	
 					}
 				}
+				if (before==myVer.getVersion())
+				{
 				try {myVer.await(myVer.getVersion());}
 				catch (InterruptedException e) {
+					if (terminate[0])
+						{terminateVM.inc();
+						synchronized (activeThreads) {
+							activeThreads[0]--;	
+						}
+						}
+					else
 					run();
+					}	
 				}
-				
 			}
+		
 			
 		};
 		for (int i=0; i<nthreads ; i++)
@@ -75,12 +96,15 @@ public class ActorThreadPool {
 
 
 	public void shutdown() throws InterruptedException {
-		for (Thread temp: threadArray)
+		terminate[0]=true;
+		myVer.inc();
+		while (activeThreads[0]!=0)
 		{
-			temp.interrupt();
-			temp.join();
+		try {
+			terminateVM.await(terminateVM.getVersion());
 		}
-		throw new InterruptedException("No existing threads");
+		catch (InterruptedException e) { }
+		}
 	}
 
 
@@ -91,8 +115,8 @@ public class ActorThreadPool {
 		}
 	}
 	
-	private PrivateState checkPrivateState (String actorId)
-	{
+	
+	public PrivateState getPrivateStates(String actorId){
 		if (stateMap.get("student").contains(actorId))
 			return new StudentPrivateState();
 		if (stateMap.get("course").contains(actorId))
@@ -103,9 +127,31 @@ public class ActorThreadPool {
 			return null;
 	}
 	
+	public Map<String, PrivateState> getActors(){
+		HashMap<String, PrivateState> output = new HashMap<String, PrivateState>();
+		for (String temp : actionMap.keySet())
+		{
+			PrivateState myState = getPrivateStates(temp);
+			output.put(temp, myState);
+		}
+		return output;
+	}
+	
 	private ActorThreadPool getPool ()
 	{
 		return this;
+	}
+	
+	public void addActor (String actorId, PrivateState actorstate)
+	{
+		actionMap.putIfAbsent(actorId, new LinkedList<Action>());
+		if (actorstate instanceof DepartmentPrivateState)
+			stateMap.put("department", actorId);
+		if (actorstate instanceof CoursePrivateState)
+			stateMap.put("course", actorId);
+		if (actorstate instanceof StudentPrivateState)
+			stateMap.put("student", actorId);
+		blockMap.putIfAbsent(actorId, new AtomicBoolean(true));
 	}
 	
 
