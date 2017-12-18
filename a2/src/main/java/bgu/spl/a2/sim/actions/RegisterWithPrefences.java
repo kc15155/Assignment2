@@ -1,51 +1,85 @@
 package bgu.spl.a2.sim.actions;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import bgu.spl.a2.Action;
+import bgu.spl.a2.Promise;
+import bgu.spl.a2.callback;
 import bgu.spl.a2.sim.privateStates.CoursePrivateState;
 import bgu.spl.a2.sim.privateStates.StudentPrivateState;
 
-public class RegisterWithPrefences extends Action {
+public class RegisterWithPrefences extends Action<Boolean> {
 	
-	private CoursePrivateState [] coursesList;
-	private int [] gradesList;
-	String courseName;
+	private List<String> coursesList;
+	private List<Integer> gradesList;
 	
-	public RegisterWithPrefences(CoursePrivateState [] coursesList, String course)
+	public RegisterWithPrefences(String [] courses, String student)
 	{
 		setActionName("Register With Prefences");
-		this.coursesList=coursesList;
+		this.coursesList = new ArrayList<String>();
+		for (String temp : courses)
+		{
+			coursesList.add(temp);
+		}
 		gradesList=null;
-		courseName=course;
 	}
 	
-	public RegisterWithPrefences(CoursePrivateState [] coursesList, int [] gradeList, String course)
+	public RegisterWithPrefences(String [] courses, int [] gradeList, String student)
 	{
 		setActionName("Register With Prefences");
-		this.coursesList=coursesList;
-		this.gradesList=gradeList;
-		courseName=course;
+		this.coursesList = new ArrayList<String>();
+		for (String temp : courses)
+		{
+			coursesList.add(temp);
+		}
+		this.gradesList = new ArrayList<Integer>();
+		for (int i=0 ; i<gradeList.length ; i++)
+		{
+			Integer temp = new Integer(gradeList[i]);
+			this.gradesList.add(temp);
+		}
 	}
 	
 	public void start ()
 	{
-		boolean isAdded=false;
-		int index=0;
-		for (CoursePrivateState temp : coursesList)
+		if (coursesList.size()>0)
 		{
-			if (isAdded)
-				break;
-			if (temp.addStudent(actorId))
-			{
-				if (gradesList==null)
-				((StudentPrivateState)actorState).getGrades().put(courseName, null);
-				else 
-				((StudentPrivateState)actorState).getGrades().put(courseName, gradesList[index]);	
-				isAdded=true;
-			}
-			else
-				index++;
+			String temp=coursesList.get(0);
+			MeetsRequirements meets = new MeetsRequirements(((CoursePrivateState)myPool.getActors().get(temp)).getPrequisites());
+			final Promise <Boolean> tempProm = (Promise<Boolean>) sendMessage(meets, actorId, actorState);
+			Collection<Action<Boolean>> toCheck = new ArrayList<Action<Boolean>>();
+			toCheck.add(meets);
+			final String tempFinal=temp;
+			callback callback = new callback() {
+				
+				public void call() {
+					if (tempProm.get() && ((CoursePrivateState)myPool.getActors().get(tempFinal)).addStudent(actorId))
+					{
+						if (gradesList==null)
+							((StudentPrivateState)actorState).getGrades().put(tempFinal, null);
+						else
+							((StudentPrivateState)actorState).getGrades().put(tempFinal, gradesList.get(0));
+						actorState.addRecord("Register With Prefences");
+						complete(true);
+					}
+					else
+					{
+						coursesList.remove(0);
+						if (gradesList!=null)
+						gradesList.remove(0);
+						start();
+					}
+				}
+			};
+			then(toCheck, callback);
 		}
-		actorState.addRecord("Register With Prefences");
+		else
+		{
+			actorState.addRecord("Register With Prefences");
+			complete(false);
+		}
 	}
 	
 

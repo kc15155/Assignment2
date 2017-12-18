@@ -9,7 +9,7 @@ import bgu.spl.a2.sim.Computer;
 import bgu.spl.a2.sim.Warehouse;
 import bgu.spl.a2.sim.privateStates.StudentPrivateState;
 
-public class AdministrativeCheck extends Action {
+public class AdministrativeCheck extends Action<Boolean> {
 	
 	private String [] students;
 	private String type;
@@ -36,6 +36,7 @@ public class AdministrativeCheck extends Action {
 					long newSignature=tempProm.get().checkAndSign(conditions,tempStudent.getGrades());
 					tempStudent.setSignature(newSignature);
 				}
+				Warehouse.getInstance().release(tempProm.get());
 				complete(true);
 			}
 		};

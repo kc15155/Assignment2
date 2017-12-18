@@ -19,16 +19,7 @@ public class SuspendingMutex {
 	}
 	
 	
-	/**
-	 * Computer acquisition procedure
-	 * Note that this procedure is non-blocking and should return immediatly
-	 * 
-	 * @param computerType
-	 * 					computer's type
-	 * 
-	 * @return a promise for the requested computer
-	 */
-	public Promise<Computer> down(String computerType){
+	public Promise<Computer> down(){
 		Promise<Computer> newPromise = new Promise<Computer>();
 		if (!isFree.get())
 		{
@@ -43,8 +34,10 @@ public class SuspendingMutex {
 	}
 
 	
-	public void up(Computer computer){
-		isFree.compareAndSet(false, true);
-		promiseQueue.poll().resolve(computer);
+	public void up(){
+		if (!promiseQueue.isEmpty())
+		promiseQueue.poll().resolve(myComputer);
+		else
+			isFree.compareAndSet(false, true);
 	}
 }

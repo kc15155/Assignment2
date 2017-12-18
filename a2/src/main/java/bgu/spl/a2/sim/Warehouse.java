@@ -27,10 +27,15 @@ public class Warehouse {
 		for (Computer temp : compList)
 		{
 			if (temp.getType()==compType)
-				return temp.getMutex().down(temp.getType());
+				return temp.getMutex().down();
 		}
 		return null;
 
+	}
+	
+	public void release(Computer computer)
+	{
+		computer.getMutex().up();
 	}
 	
 	public static Warehouse getInstance() {

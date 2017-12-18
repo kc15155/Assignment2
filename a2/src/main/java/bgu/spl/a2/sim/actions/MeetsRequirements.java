@@ -5,7 +5,7 @@ import java.util.List;
 import bgu.spl.a2.Action;
 import bgu.spl.a2.sim.privateStates.StudentPrivateState;
 
-public class MeetsRequirements extends Action{
+public class MeetsRequirements extends Action<Boolean>{
 	
 	private List<String> courses;
 	

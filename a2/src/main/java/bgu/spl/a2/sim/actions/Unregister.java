@@ -4,7 +4,7 @@ import bgu.spl.a2.Action;
 import bgu.spl.a2.sim.privateStates.CoursePrivateState;
 import bgu.spl.a2.sim.privateStates.StudentPrivateState;
 
-public class Unregister extends Action{
+public class Unregister extends Action<Boolean>{
 	
 	private StudentPrivateState myStudent;
 	private String studentName;
@@ -18,12 +18,12 @@ public class Unregister extends Action{
 	
 	public void start()
 	{
-		if (actorState instanceof CoursePrivateState)
-		{
+		
 			if(((CoursePrivateState)actorState).removeStudent(studentName))
 				myStudent.getGrades().remove(actorId);	
 			actorState.addRecord(getActionName());
-		}
+			complete(true);
+		
 	}
 
 }
