@@ -11,11 +11,11 @@ import bgu.spl.a2.sim.privateStates.StudentPrivateState;
 
 public class AdministrativeCheck extends Action<Boolean> {
 	
-	private String [] students;
+	private List <String> students;
 	private String type;
 	private List<String> conditions;
 	
-	public AdministrativeCheck(String [] studentsList, String compType, List<String> conditions)
+	public AdministrativeCheck(List<String> studentsList, String compType, List<String> conditions)
 	{
 		setActionName("Administrative Check");
 		students=studentsList;

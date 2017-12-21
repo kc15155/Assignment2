@@ -13,13 +13,7 @@ public class ParticipateInCourse extends Action <Boolean>{
 	
 	private String toAdd;
 	private Integer grade;
-	
-	public ParticipateInCourse (String toAdd)
-	{
-		this.setActionName("Participate in Course");
-		this.toAdd=toAdd;
-		grade=null;
-	}
+
 	
 	public ParticipateInCourse (String toAdd, int grade)
 	{

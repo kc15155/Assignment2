@@ -40,7 +40,7 @@ public class Computer {
 		int counter=0;
 		for (String temp : courses)
 		{
-			if (coursesGrades.get(temp)!=null && coursesGrades.get(temp).intValue()>56)
+			if (coursesGrades.get(temp)!=null && coursesGrades.get(temp).intValue()>=56)
 				counter++;
 		}
 		if (counter==courses.size())

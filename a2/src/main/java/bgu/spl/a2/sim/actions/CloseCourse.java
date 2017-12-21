@@ -26,8 +26,7 @@ public class CloseCourse extends Action<Boolean>{
 		final CoursePrivateState toRemove = (CoursePrivateState) myPool.getActors().get(courseName);
 		for (String temp : toRemove.getRegStudents())
 		{
-			StudentPrivateState tempStudent=((StudentPrivateState)myPool.getActors().get(temp));
-			Unregister tempUn= new Unregister(tempStudent, temp);
+			Unregister tempUn= new Unregister(temp);
 			myCollection.add(tempUn);
 			sendMessage(tempUn, courseName, toRemove);
 		}

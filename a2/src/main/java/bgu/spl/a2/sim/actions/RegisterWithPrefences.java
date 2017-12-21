@@ -15,31 +15,12 @@ public class RegisterWithPrefences extends Action<Boolean> {
 	private List<String> coursesList;
 	private List<Integer> gradesList;
 	
-	public RegisterWithPrefences(String [] courses, String student)
-	{
-		setActionName("Register With Prefences");
-		this.coursesList = new ArrayList<String>();
-		for (String temp : courses)
-		{
-			coursesList.add(temp);
-		}
-		gradesList=null;
-	}
 	
-	public RegisterWithPrefences(String [] courses, int [] gradeList, String student)
+	public RegisterWithPrefences(List <String> courses, List <Integer> gradeList)
 	{
 		setActionName("Register With Prefences");
-		this.coursesList = new ArrayList<String>();
-		for (String temp : courses)
-		{
-			coursesList.add(temp);
-		}
-		this.gradesList = new ArrayList<Integer>();
-		for (int i=0 ; i<gradeList.length ; i++)
-		{
-			Integer temp = new Integer(gradeList[i]);
-			this.gradesList.add(temp);
-		}
+		this.coursesList = courses;
+		this.gradesList = gradeList;
 	}
 	
 	public void start ()

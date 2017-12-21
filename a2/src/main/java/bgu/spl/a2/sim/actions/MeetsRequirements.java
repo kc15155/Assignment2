@@ -21,7 +21,7 @@ public class MeetsRequirements extends Action<Boolean>{
 		StudentPrivateState me = ((StudentPrivateState)actorState);
 		for (String temp : courses)
 		{
-			if ((!me.getGrades().containsKey(temp)) || me.getGrades().get(temp).intValue()<=56)
+			if (!me.getGrades().containsKey(temp))
 			{
 				meetsReq=false;
 			}

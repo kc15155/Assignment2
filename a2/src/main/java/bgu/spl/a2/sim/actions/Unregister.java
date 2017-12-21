@@ -6,21 +6,20 @@ import bgu.spl.a2.sim.privateStates.StudentPrivateState;
 
 public class Unregister extends Action<Boolean>{
 	
-	private StudentPrivateState myStudent;
 	private String studentName;
 	
-	public Unregister(StudentPrivateState student, String studentName)
+	public Unregister(String studentName)
 	{
 		this.setActionName("Unregister");
-		myStudent=student;
 		this.studentName=studentName;
 	}
 	
 	public void start()
 	{
+		StudentPrivateState tempStudent = (StudentPrivateState) myPool.getPrivateStates(studentName);
 		
 			if(((CoursePrivateState)actorState).removeStudent(studentName))
-				myStudent.getGrades().remove(actorId);	
+				tempStudent.getGrades().remove(actorId);	
 			actorState.addRecord(getActionName());
 			complete(true);
 		
