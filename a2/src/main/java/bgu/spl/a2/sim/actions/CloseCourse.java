@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import bgu.spl.a2.Action;
-import bgu.spl.a2.Promise;
 import bgu.spl.a2.callback;
 import bgu.spl.a2.sim.privateStates.CoursePrivateState;
 import bgu.spl.a2.sim.privateStates.DepartmentPrivateState;
-import bgu.spl.a2.sim.privateStates.StudentPrivateState;
+
 
 public class CloseCourse extends Action<Boolean>{
 	

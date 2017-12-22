@@ -1,14 +1,13 @@
 package bgu.spl.a2;
 
 import java.util.Collection;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 
 public abstract class Action<R> {
 	
-	protected String name;
-	private Promise<R> result; 
+	protected String actionName;
+	private Promise<R> result=new Promise<R>();
 	protected ActorThreadPool myPool;
 	private callback myCallback;
 	protected String actorId;
@@ -58,7 +57,8 @@ public abstract class Action<R> {
  
     protected final void complete(R result) {
        	this.result.resolve(result);
-   
+       	System.out.println(actionName);
+       	actorState.addRecord(this.actionName);
     }
     
 
@@ -75,12 +75,12 @@ public abstract class Action<R> {
 	
 
 	public void setActionName(String actionName){
-        this.name=actionName;
+        this.actionName=actionName;
 	}
 
 	
 	public String getActionName(){
-        return name;
+        return actionName;
 	}
 	
 	private Action<R> getAction()

@@ -13,12 +13,14 @@ public class VersionMonitor {
        return _version;
     }
 
-    public void inc() {
+    synchronized public void inc() {
         _version++;
+        notifyAll();
     }
 
-    public void await(int version) throws InterruptedException {
-        while (_version==version);
+    synchronized public void await(int version) throws InterruptedException {
+        while (_version==version)
+        { wait();}
         throw new InterruptedException("Versions don't match");
     }
 }

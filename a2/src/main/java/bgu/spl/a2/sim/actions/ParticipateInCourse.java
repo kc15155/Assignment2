@@ -36,7 +36,6 @@ public class ParticipateInCourse extends Action <Boolean>{
 						{
 						if (((CoursePrivateState)actorState).addStudent(toAdd))
 							((StudentPrivateState)myPool.getActors().get(toAdd)).getGrades().put(actorId,grade);
-							actorState.addRecord(getActionName());
 							complete(true);
 						}
 				}

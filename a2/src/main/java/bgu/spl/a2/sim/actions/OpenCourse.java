@@ -25,24 +25,18 @@ public class OpenCourse extends Action<Boolean>{
 	
 	public void start()
 	{
-		Action<Boolean> addCourseNow = new Action<Boolean>()
-		{
-			protected void start()
-			{
-				complete(true);
-			}
-		};
+
 		Collection<Action<Boolean>> toAdd = new ArrayList<Action<Boolean>>();
+		DummyAction dummy= new DummyAction();
 		CoursePrivateState newCourse = new CoursePrivateState();
 		newCourse.setAvailable(available);
 		newCourse.setPrequisites(reqs);
-		toAdd.add(addCourseNow);
-		sendMessage(addCourseNow, courseName, newCourse);
+		toAdd.add(dummy);
+		sendMessage(dummy, courseName, newCourse);
 		callback callback = new callback() {
 			
 			public void call() {
 				((DepartmentPrivateState)actorState).addCourse(courseName);
-				actorState.addRecord(getActionName());
 				complete(true);
 			}
 		};

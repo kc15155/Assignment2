@@ -26,7 +26,6 @@ public class MeetsRequirements extends Action<Boolean>{
 				meetsReq=false;
 			}
 		}
-		actorState.addRecord("Meets Requirements");
 		complete(meetsReq);
 	}
 

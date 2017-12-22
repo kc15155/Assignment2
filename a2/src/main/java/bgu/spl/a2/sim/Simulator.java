@@ -12,10 +12,8 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 
-import javax.imageio.stream.MemoryCacheImageInputStream;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
@@ -23,7 +21,6 @@ import com.google.gson.stream.JsonReader;
 import bgu.spl.a2.Action;
 import bgu.spl.a2.ActorThreadPool;
 import bgu.spl.a2.PrivateState;
-import bgu.spl.a2.VersionMonitor;
 import bgu.spl.a2.callback;
 import bgu.spl.a2.sim.actions.AddSpaces;
 import bgu.spl.a2.sim.actions.AddStudent;
@@ -36,8 +33,6 @@ import bgu.spl.a2.sim.actions.Unregister;
 import bgu.spl.a2.sim.json.Input;
 import bgu.spl.a2.sim.json.JsonComputer;
 import bgu.spl.a2.sim.json.Phase1AndActions;
-import bgu.spl.a2.sim.json.Phase2;
-import bgu.spl.a2.sim.json.Phase3;
 import bgu.spl.a2.sim.privateStates.CoursePrivateState;
 import bgu.spl.a2.sim.privateStates.DepartmentPrivateState;
 import bgu.spl.a2.sim.privateStates.StudentPrivateState;
@@ -69,7 +64,8 @@ public class Simulator {
 	
 	public static void main(String [] args){
 		
-		
+//		for (int i=0 ; i<10 ; i++)
+//		{
 		try
 		{
 		Gson gson = new Gson();
@@ -83,6 +79,7 @@ public class Simulator {
 			
 		}
 		
+
 		start();
 		
 		tracker = new CountDownLatch(myInput.getPhase1().size());
@@ -152,6 +149,7 @@ public class Simulator {
 		{
 			exc5.printStackTrace();
 		}
+//		}
 	}
 	
 	private static void submitAction (Phase1AndActions toAdd)

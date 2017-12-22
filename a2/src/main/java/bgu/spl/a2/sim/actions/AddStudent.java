@@ -3,9 +3,6 @@ package bgu.spl.a2.sim.actions;
 
 import java.util.ArrayList;
 import java.util.Collection;
-
-import javax.net.ssl.ExtendedSSLSession;
-
 import bgu.spl.a2.Action;
 import bgu.spl.a2.callback;
 import bgu.spl.a2.sim.privateStates.DepartmentPrivateState;
@@ -23,20 +20,15 @@ public class AddStudent extends Action<Boolean> {
 	
 	public void start()
 	{
-			Action<Boolean> addNow = new Action<Boolean>() 
-			{
-				protected void start() {
-					complete(true);
-				}
-			};
+			
 			Collection<Action<Boolean>> toAdd = new ArrayList<Action<Boolean>>();
-			toAdd.add(addNow);
-			sendMessage(addNow, studentName, new StudentPrivateState());
+			DummyAction dummy = new DummyAction();
+			toAdd.add(dummy);
+			sendMessage(dummy, studentName, new StudentPrivateState());
 			callback callback = new callback() {
 				
 				public void call() {
 					((DepartmentPrivateState)actorState).addStudent(studentName);
-					actorState.addRecord(getActionName());
 					complete(true);
 				}
 			};

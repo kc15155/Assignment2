@@ -19,13 +19,12 @@ public class AdministrativeCheck extends Action<Boolean> {
 	{
 		setActionName("Administrative Check");
 		students=studentsList;
-		compType=type;
+		type=compType;
 		this.conditions=conditions;
 	}
 	
 	public void start ()
 	{
-		
 		final Promise<Computer> tempProm=Warehouse.getInstance().acquire(type);
 		callback newCall = new callback() {
 			
@@ -41,7 +40,6 @@ public class AdministrativeCheck extends Action<Boolean> {
 			}
 		};
 		tempProm.subscribe(newCall);
-		actorState.addRecord("Administrative Check");
 		
 	}
 

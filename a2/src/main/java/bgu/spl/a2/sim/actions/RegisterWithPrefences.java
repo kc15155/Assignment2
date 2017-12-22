@@ -42,7 +42,6 @@ public class RegisterWithPrefences extends Action<Boolean> {
 							((StudentPrivateState)actorState).getGrades().put(tempFinal, null);
 						else
 							((StudentPrivateState)actorState).getGrades().put(tempFinal, gradesList.get(0));
-						actorState.addRecord("Register With Prefences");
 						complete(true);
 					}
 					else

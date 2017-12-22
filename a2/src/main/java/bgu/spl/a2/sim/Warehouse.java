@@ -1,6 +1,7 @@
 package bgu.spl.a2.sim;
 
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 import bgu.spl.a2.Promise;
 
@@ -26,10 +27,10 @@ public class Warehouse {
 	{
 		for (Computer temp : compList)
 		{
-			if (temp.getType()==compType)
+			if (temp.getType().equals(compType))
 				return temp.getMutex().down();
 		}
-		return null;
+		throw new NoSuchElementException();
 
 	}
 	

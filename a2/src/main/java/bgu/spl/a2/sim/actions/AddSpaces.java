@@ -18,8 +18,11 @@ public class AddSpaces extends Action <Boolean>{
 		
 			int temp=((CoursePrivateState)actorState).getAvailableSpots().intValue();
 			if (temp!=-1)
+			{
 				((CoursePrivateState)actorState).setAvailable(temp+newSpots);
-			actorState.addRecord(getActionName());
-			complete(true);
+				complete(true);
+			}
+			else
+				complete(false);
 	}
 }
