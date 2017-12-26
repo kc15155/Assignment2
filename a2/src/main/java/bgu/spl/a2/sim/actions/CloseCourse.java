@@ -2,6 +2,7 @@ package bgu.spl.a2.sim.actions;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import bgu.spl.a2.Action;
 import bgu.spl.a2.callback;
@@ -21,23 +22,23 @@ public class CloseCourse extends Action<Boolean>{
 	
 	public void start()
 	{
-		Collection<Unregister> myCollection= new ArrayList<Unregister>();
-		final CoursePrivateState toRemove = (CoursePrivateState) myPool.getActors().get(courseName);
-		for (String temp : toRemove.getRegStudents())
-		{
-			Unregister tempUn= new Unregister(temp);
-			myCollection.add(tempUn);
-			sendMessage(tempUn, courseName, toRemove);
-		}
-		callback tempCallback = new callback() {
+		CloseCourseImmediately firstStep = new CloseCourseImmediately();
+		Collection<Action<List<String>>> myCollection= new ArrayList<>();
+		myCollection.add(firstStep);
+		sendMessage(firstStep, courseName, myPool.getPrivateState(courseName));
+		then(myCollection, new callback() {
 			
+			@Override
 			public void call() {
-				((DepartmentPrivateState)actorState).getCourseList().remove(courseName);
-				toRemove.setAvailable(-1);
+				for (String temp : firstStep.getResult().get())
+				{
+					Unregister tempUn= new Unregister(temp);
+					sendMessage(tempUn, courseName, myPool.getPrivateState(courseName));
+				}
+				((DepartmentPrivateState)actorState).removeCourse(courseName);
 				complete(true);
 			}
-		};
-		then(myCollection, tempCallback);
+		});
 	}
 
 }

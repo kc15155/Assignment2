@@ -29,7 +29,7 @@ public class Promise<T>{
 
 
 
-	public void resolve(T value){
+	public synchronized void resolve(T value){
 		if (isRes)
 			throw new IllegalStateException("Already resolved");
 		this.value=value;
@@ -42,7 +42,7 @@ public class Promise<T>{
 	}
 
 	
-	public void subscribe(callback callback) {
+	public synchronized void subscribe(callback callback) {
 		if (isRes)
 			callback.call();
 		else

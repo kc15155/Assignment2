@@ -32,12 +32,20 @@ public class DepartmentPrivateState extends PrivateState{
 	
 	public void addCourse(String newCourse)
 	{
+		if (!courseList.contains(newCourse))
 		courseList.add(newCourse);
 	}
 	
 	public void addStudent(String newStudent)
 	{
+		if (!studentList.contains(newStudent))
 		studentList.add(newStudent);
+	}
+	
+	public void removeCourse (String toRemove)
+	{
+		if (courseList.contains(toRemove))
+			courseList.remove(toRemove);
 	}
 	
 }

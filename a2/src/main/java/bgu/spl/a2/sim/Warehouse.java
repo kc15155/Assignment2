@@ -34,9 +34,13 @@ public class Warehouse {
 
 	}
 	
-	public void release(Computer computer)
+	public void release(String type)
 	{
-		computer.getMutex().up();
+		for (Computer temp : compList)
+		{
+			if (temp.getType().equals(type))
+				temp.getMutex().up();
+		}
 	}
 	
 	public static Warehouse getInstance() {

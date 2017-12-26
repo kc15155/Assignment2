@@ -55,7 +55,7 @@ public class CoursePrivateState extends PrivateState{
 	
 	public boolean addStudent (String newStudent)
 	{
-		if (availableSpots>0)
+		if (availableSpots>0 && !regStudents.contains(newStudent))
 		{
 			availableSpots--;
 			registered++;
@@ -65,15 +65,14 @@ public class CoursePrivateState extends PrivateState{
 		return false;
 	}
 	
-	public boolean removeStudent (String student)
+	public void removeStudent (String student)
 	{
 		if (regStudents.contains(student))
 		{
-			availableSpots++;
 			registered--;
 			regStudents.remove(student);
-			return true;
+			if (availableSpots!=-1)
+				availableSpots++;
 		}
-		return false;
 	}
 }

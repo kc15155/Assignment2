@@ -18,10 +18,9 @@ public class MeetsRequirements extends Action<Boolean>{
 	public void start ()
 	{
 		boolean meetsReq=true;
-		StudentPrivateState me = ((StudentPrivateState)actorState);
 		for (String temp : courses)
 		{
-			if (!me.getGrades().containsKey(temp))
+			if (!((StudentPrivateState)actorState).getGrades().containsKey(temp))
 			{
 				meetsReq=false;
 			}

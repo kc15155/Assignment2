@@ -28,7 +28,7 @@ import bgu.spl.a2.sim.actions.AdministrativeCheck;
 import bgu.spl.a2.sim.actions.CloseCourse;
 import bgu.spl.a2.sim.actions.OpenCourse;
 import bgu.spl.a2.sim.actions.ParticipateInCourse;
-import bgu.spl.a2.sim.actions.RegisterWithPrefences;
+import bgu.spl.a2.sim.actions.RegisterWithPreferences;
 import bgu.spl.a2.sim.actions.Unregister;
 import bgu.spl.a2.sim.json.Input;
 import bgu.spl.a2.sim.json.JsonComputer;
@@ -64,8 +64,7 @@ public class Simulator {
 	
 	public static void main(String [] args){
 		
-//		for (int i=0 ; i<10 ; i++)
-//		{
+
 		try
 		{
 		Gson gson = new Gson();
@@ -149,7 +148,7 @@ public class Simulator {
 		{
 			exc5.printStackTrace();
 		}
-//		}
+
 	}
 	
 	private static void submitAction (Phase1AndActions toAdd)
@@ -162,7 +161,7 @@ public class Simulator {
 		{
 			newAction = new OpenCourse(Integer.parseInt(toAdd.getSpace()), toAdd.getPrerequisites(), toAdd.getCourse());
 			actorId=toAdd.getDepartment();
-			actorstate= actorThreadPool.getPrivateStates(actorId);
+			actorstate= actorThreadPool.getPrivateState(actorId);
 			if (actorstate==null)
 				actorstate=new DepartmentPrivateState();
 			added=true;
@@ -173,7 +172,7 @@ public class Simulator {
 		{
 			newAction = new AddStudent(toAdd.getStudent());
 			actorId=toAdd.getDepartment();
-			actorstate=actorThreadPool.getPrivateStates(actorId);
+			actorstate=actorThreadPool.getPrivateState(actorId);
 			if (actorstate==null)
 				actorstate = new DepartmentPrivateState();
 			added=true;
@@ -183,7 +182,7 @@ public class Simulator {
 		{
 			newAction = new AddSpaces(Integer.parseInt(toAdd.getNumber()));
 			actorId=toAdd.getCourse();
-			actorstate=actorThreadPool.getPrivateStates(actorId);
+			actorstate=actorThreadPool.getPrivateState(actorId);
 			if (actorstate==null)
 				actorstate=new CoursePrivateState();
 			added=true;
@@ -194,7 +193,7 @@ public class Simulator {
 		{
 			newAction=new AdministrativeCheck(toAdd.getStudents(), toAdd.getComputer(), toAdd.getConditions());
 			actorId=toAdd.getDepartment();
-			actorstate=actorThreadPool.getPrivateStates(actorId);
+			actorstate=actorThreadPool.getPrivateState(actorId);
 			if (actorstate==null)
 				actorstate=new DepartmentPrivateState();
 			added=true;
@@ -204,7 +203,7 @@ public class Simulator {
 		{
 			newAction = new CloseCourse(toAdd.getCourse());
 			actorId=toAdd.getDepartment();
-			actorstate=actorThreadPool.getPrivateStates(actorId);
+			actorstate=actorThreadPool.getPrivateState(actorId);
 			if (actorstate==null)
 				actorstate=new DepartmentPrivateState();
 			added=true;
@@ -217,7 +216,7 @@ public class Simulator {
 			else 
 			newAction = new ParticipateInCourse(toAdd.getStudent(), Integer.parseInt(toAdd.getGrade().get(0)));
 			actorId=toAdd.getCourse();
-			actorstate=actorThreadPool.getPrivateStates(actorId);
+			actorstate=actorThreadPool.getPrivateState(actorId);
 			if (actorstate==null)
 				actorstate=new CoursePrivateState();
 			added=true;
@@ -227,14 +226,14 @@ public class Simulator {
 		{
 			newAction=new Unregister(toAdd.getStudent());
 			actorId=toAdd.getCourse();
-			actorstate=actorThreadPool.getPrivateStates(actorId);
+			actorstate=actorThreadPool.getPrivateState(actorId);
 			if (actorstate==null)
 				actorstate=new CoursePrivateState();
 			added=true;
 			
 		}
 		
-		if (toAdd.getAction().equals("Register With Prefences"))
+		if (toAdd.getAction().equals("Register With Preferences"))
 		{
 			List<Integer> studentGrades = new ArrayList<Integer>();
 			for (String temp : toAdd.getGrade())
@@ -245,16 +244,19 @@ public class Simulator {
 						studentGrades.add(Integer.parseInt(temp));
 					}
 			}
-			newAction=new RegisterWithPrefences(toAdd.getPreferences(), studentGrades);
+			newAction=new RegisterWithPreferences(toAdd.getPreferences(), studentGrades);
 			actorId=toAdd.getStudent();
-			actorstate=actorThreadPool.getPrivateStates(actorId);
+			actorstate=actorThreadPool.getPrivateState(actorId);
 			if (actorstate==null)
 				actorstate=new StudentPrivateState();
 			added=true;
 		}
 		
 		if (!added)
+		{
+			System.out.println(toAdd.getAction()+"??????????????????");
 			throw new IllegalArgumentException("Illegal Action");
+		}
 		newAction.getResult().subscribe(new callback() {
 			
 			public void call() {

@@ -4,18 +4,11 @@ package bgu.spl.a2;
 import java.util.ArrayDeque;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.w3c.dom.css.Counter;
-
-import bgu.spl.a2.sim.privateStates.CoursePrivateState;
-import bgu.spl.a2.sim.privateStates.DepartmentPrivateState;
-import bgu.spl.a2.sim.privateStates.StudentPrivateState;
 
 
 
@@ -30,6 +23,35 @@ public class ActorThreadPool {
 	CountDownLatch terminator;
 	protected ActorThreadPool myPool;
 	
+	private synchronized HashMap<String, Action> getAction()
+	{
+		for (String temp : actionMap.keySet())
+		{
+			try
+			{
+			if (blockMap.get(temp)==null || stateMap.get(temp)==null)
+				throw new ConcurrentModificationException();
+			if (blockMap.get(temp).compareAndSet(true,false))
+			{ 
+				if (!actionMap.get(temp).isEmpty())
+				{
+					HashMap<String, Action> output = new HashMap<>();
+					Action tempAction = actionMap.get(temp).remove();
+					output.put(temp, tempAction);
+					return output;
+				}
+				else
+				{
+					synchronized (blockMap) {
+						blockMap.get(temp).set(true);
+					}
+				}
+			}	
+			}
+			catch (ConcurrentModificationException notImportant) {}	
+	   }
+		return null;
+	}
 	
 	public ActorThreadPool(int nthreads) {
 		stateMap = new HashMap<String, PrivateState>();
@@ -44,42 +66,24 @@ public class ActorThreadPool {
 			public void run() {
 				while (!terminate[0])
 				{
-				try
-				{
-					boolean wasBusy=false;
 					int before = myVer.getVersion();
-					for (String temp : actionMap.keySet())
+					HashMap<String, Action> tempMap = getAction();
+					if (tempMap!=null)
 					{
-
-						if (blockMap.get(temp)==null || stateMap.get(temp)==null)
-							throw new ConcurrentModificationException();
-						if (blockMap.get(temp).compareAndSet(true,false))
-						{
-							Action tempAction;
-							wasBusy=true;
-							if (!actionMap.get(temp).isEmpty())
-							{
-								synchronized (actionMap.get(temp)) {
-										tempAction=actionMap.get(temp).remove();
-										myVer.inc();
-								}
-									tempAction.handle(myPool, temp, myPool.getPrivateStates(temp));
-							}
-							blockMap.get(temp).set(true);
-						}	
-					   }
-					
-
-						if (!wasBusy)
-						{
-							try {myVer.await(before);}
-							catch (InterruptedException e) {}
+						
+						String actorId=(String) (tempMap.keySet().toArray())[0];
+						tempMap.get(actorId).handle(myPool, actorId, getPrivateState(actorId));
+						synchronized (blockMap) {
+							blockMap.get(actorId).set(true);
 						}
+						myVer.inc();
 					}
-					
-						catch (ConcurrentModificationException notImportant) {} //try again
-					
-			}
+					else
+					{
+						try {myVer.await(before);}
+						catch (InterruptedException toIgnore) { }
+					}						
+				}
 				terminator.countDown();
 			}
 			
@@ -92,7 +96,7 @@ public class ActorThreadPool {
 	}
 
 
-	public void submit(Action<?> action, String actorId, PrivateState actorState) {
+	public synchronized void submit(Action<?> action, String actorId, PrivateState actorState) {
 		if (!actionMap.containsKey(actorId))
 		{
 			actionMap.put(actorId, new ArrayDeque<Action>());
@@ -119,7 +123,7 @@ public class ActorThreadPool {
 	}
 	
 	
-	public PrivateState getPrivateStates(String actorId){
+	public PrivateState getPrivateState(String actorId){
 			return stateMap.get(actorId);
 	}
 	

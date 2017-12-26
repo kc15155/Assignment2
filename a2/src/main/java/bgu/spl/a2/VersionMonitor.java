@@ -20,7 +20,9 @@ public class VersionMonitor {
 
     synchronized public void await(int version) throws InterruptedException {
         while (_version==version)
-        { wait();}
-        throw new InterruptedException("Versions don't match");
+        { 
+        	wait();
+       	}
+        throw new InterruptedException();
     }
 }

@@ -1,6 +1,7 @@
 package bgu.spl.a2;
 
 import java.util.Collection;
+import java.util.concurrent.CountDownLatch;
 
 
 
@@ -17,12 +18,13 @@ public abstract class Action<R> {
     
 
    /*package*/ final void handle(ActorThreadPool pool, String actorId, PrivateState actorState) {
-	   
 	   this.actorState=actorState;
 	   this.actorId=actorId;
 	   this.myPool=pool;
 	   if (myCallback==null)
+	   {
 		   start();
+	   }
 	   else
 	   {
 		   myCallback.call();
@@ -33,17 +35,22 @@ public abstract class Action<R> {
    	protected final void then(Collection<? extends Action<?>> actions, callback callback) {
    		
    		final callback toAdd=callback;
-    	final int actionSize=actions.size();
-   		final int [] counter = new int [1];
-   		counter[0]=0;
+    	int [] actionsCounter = {0};
+    	if (actions.isEmpty())
+    	{
+    		myPool.submit(getAction(), actorId, actorState);
+    	}
+    	
    		callback newCall = new callback() {
 			
 			public void call() {
-				counter[0]++;
-				if (counter[0]==actionSize)
-				{
-					myCallback=toAdd;
-					sendMessage(getAction(), actorId, actorState);
+				synchronized (actionsCounter) {
+					actionsCounter[0]++;
+					if (actionsCounter[0]==actions.size())
+					{
+						myCallback=toAdd;
+						myPool.submit(getAction(), actorId, actorState);
+					}
 				}
 			}
 		};
@@ -57,8 +64,7 @@ public abstract class Action<R> {
  
     protected final void complete(R result) {
        	this.result.resolve(result);
-       	System.out.println(actionName);
-       	actorState.addRecord(this.actionName);
+       	actorState.addRecord(getActionName());
     }
     
 

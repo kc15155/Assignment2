@@ -31,4 +31,18 @@ public class StudentPrivateState extends PrivateState{
 	{
 		signature=newSignature;
 	}
+	
+	public void removeGrade(String course)
+	{
+		if (grades.containsKey(course))
+			grades.remove(course);
+	}
+	
+	public Integer getGrade (String course)
+	{
+		if (grades.containsKey(course))
+			return grades.get(course);
+		else
+			return null;
+	}
 }

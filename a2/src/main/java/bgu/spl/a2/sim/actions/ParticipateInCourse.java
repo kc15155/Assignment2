@@ -11,14 +11,14 @@ import bgu.spl.a2.sim.privateStates.StudentPrivateState;
 
 public class ParticipateInCourse extends Action <Boolean>{
 	
-	private String toAdd;
+	private String studentName;
 	private Integer grade;
 
 	
 	public ParticipateInCourse (String toAdd, int grade)
 	{
-		this.setActionName("Participate in Course");
-		this.toAdd=toAdd;
+		this.setActionName("Participate In Course");
+		this.studentName=toAdd;
 		this.grade=new Integer(grade);
 	}
 	
@@ -26,18 +26,31 @@ public class ParticipateInCourse extends Action <Boolean>{
 	{
 
 			MeetsRequirements checkReqs = new MeetsRequirements(((CoursePrivateState)actorState).getPrequisites());
-			final Promise<Boolean> myPromise = (Promise<Boolean>) sendMessage(checkReqs, toAdd, myPool.getActors().get(toAdd));
+			sendMessage(checkReqs, studentName, myPool.getPrivateState(studentName));
 			Collection<Action<Boolean>> toCheck = new ArrayList<Action<Boolean>>();
 			toCheck.add(checkReqs);
 			callback callback = new callback() {
 				
 				public void call() {
-					if (myPromise.get())
+					if (checkReqs.getResult().get() && ((CoursePrivateState)actorState).getAvailableSpots()>0)
+					{
+						((CoursePrivateState)actorState).addStudent(studentName);
+						AddNewGrade addNewGrade = new AddNewGrade(actorId, grade);
+						sendMessage(addNewGrade, studentName, myPool.getPrivateState(studentName));
+						Collection<Action<Boolean>> toCheckSecond = new ArrayList<Action<Boolean>>();
+						toCheckSecond.add(addNewGrade);
+						then(toCheckSecond, new callback() {
+							
+							@Override
+							public void call() {
+								complete(true);
+							}
+						});
+					}
+					else
 						{
-						if (((CoursePrivateState)actorState).addStudent(toAdd))
-							((StudentPrivateState)myPool.getActors().get(toAdd)).getGrades().put(actorId,grade);
-							complete(true);
-						}
+						complete(false);
+					}
 				}
 			};
 			then(toCheck, callback);
